@@ -10,9 +10,9 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,6 +33,7 @@ import jr.brian.basiccarmaintenance.model.local.BottomMenuContent
 import jr.brian.basiccarmaintenance.model.local.VehicleItem
 import jr.brian.basiccarmaintenance.standardQuadFromTo
 import jr.brian.basiccarmaintenance.util.MyDataStore
+import jr.brian.basiccarmaintenance.util.ShowDialog
 import jr.brian.basiccarmaintenance.view.ui.theme.*
 import jr.brian.basiccarmaintence.R
 import kotlinx.coroutines.launch
@@ -47,56 +48,63 @@ fun HomePage() {
             .fillMaxSize()
     ) {
         val vehicles = listOf("Jeep Cherokee '14", "Vestar Mini")
+        val avgMileage =
+            dataStore.getDailyMileageAverage.collectAsState(0f)
         Column {
             InfoSection()
-            VehicleSection(
-                vehicles = vehicles,
-                dataStore = dataStore
-            )
-//            CurrentVehicle(
-//                defaultVehicle = vehicles[0],
+//            VehicleSection(
+//                vehicles = vehicles,
 //                dataStore = dataStore
 //            )
+            CurrentVehicle(
+                defaultVehicle = vehicles[0],
+                dataStore = dataStore
+            )
             VehicleItemsSection(
+                dataStore = dataStore,
                 vehicleItems = listOf(
                     VehicleItem(
                         title = "Motor Oil Usage",
-                        usagePercentage = ".91f",
+                        usagePercentage = if (avgMileage.value == null) {
+                            0f
+                            // TODO - replace 24 with number of days passed since last save
+                        } else (avgMileage.value!! * 24) / 3000,
                         lightColorStr = BlueViolet1.value.toString(),
                         mediumColorStr = BlueViolet2.value.toString(),
                         darkColorStr = BlueViolet3.value.toString()
                     ),
                     VehicleItem(
                         title = "Coolant Usage",
-                        usagePercentage = ".77f",
+                        usagePercentage = if (avgMileage.value == null) {
+                            0f
+                        } else (avgMileage.value!! * 24) / 30000,
                         lightColorStr = LightGreen1.value.toString(),
                         mediumColorStr = LightGreen2.value.toString(),
                         darkColorStr = LightGreen3.value.toString()
                     ),
                     VehicleItem(
                         title = "Brake Fluid Usage",
-                        usagePercentage = ".25f",
+                        usagePercentage = if (avgMileage.value == null) {
+                            0f
+                        } else (avgMileage.value!! * 24) / 30000,
                         lightColorStr = OrangeYellow1.value.toString(),
                         mediumColorStr = OrangeYellow2.value.toString(),
                         darkColorStr = OrangeYellow3.value.toString()
                     ),
                     VehicleItem(
                         title = "Power Steering Usage",
-                        usagePercentage = ".2f",
+                        usagePercentage = if (avgMileage.value == null) {
+                            0f
+                        } else (avgMileage.value!! * 24) / 60000,
                         lightColorStr = Beige1.value.toString(),
                         mediumColorStr = Beige2.value.toString(),
                         darkColorStr = Beige3.value.toString()
                     ),
                     VehicleItem(
-                        title = "Wipe Blades Usage",
-                        usagePercentage = ".8f",
-                        lightColorStr = LightGreen1.value.toString(),
-                        mediumColorStr = LightGreen2.value.toString(),
-                        darkColorStr = LightGreen3.value.toString()
-                    ),
-                    VehicleItem(
                         title = "Brake Pads Usage",
-                        usagePercentage = ".96f",
+                        usagePercentage = if (avgMileage.value == null) {
+                            0f
+                        } else (avgMileage.value!! * 24) / 10000,
                         lightColorStr = OrangeYellow1.value.toString(),
                         mediumColorStr = OrangeYellow2.value.toString(),
                         darkColorStr = OrangeYellow3.value.toString()
@@ -212,7 +220,7 @@ private fun CurrentVehicle(
 }
 
 @Composable
-private fun VehicleItemsSection(vehicleItems: List<VehicleItem>) {
+private fun VehicleItemsSection(vehicleItems: List<VehicleItem>, dataStore: MyDataStore) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = "Items",
@@ -225,7 +233,7 @@ private fun VehicleItemsSection(vehicleItems: List<VehicleItem>) {
             modifier = Modifier.fillMaxWidth()
         ) {
             items(vehicleItems.size) {
-                VehicleItem(vehicleItem = vehicleItems[it])
+                VehicleItem(vehicleItem = vehicleItems[it], dataStore = dataStore)
             }
         }
     }
@@ -234,14 +242,20 @@ private fun VehicleItemsSection(vehicleItems: List<VehicleItem>) {
 @Composable
 private fun VehicleItem(
     vehicleItem: VehicleItem,
+    dataStore: MyDataStore
 ) {
+    val ctx = LocalContext.current
+    val isShowingInfo = remember { mutableStateOf(false) }
     BoxWithConstraints(
         modifier = Modifier
             .padding(8.5.dp)
             .aspectRatio(1f)
             .clip(RoundedCornerShape(10.dp))
             .background(Color(vehicleItem.darkColorStr.toULong()))
+            .clickable { isShowingInfo.value = true }
     ) {
+        InfoDialog(isShowing = isShowingInfo, dataStore = dataStore)
+
         val width = constraints.maxWidth
         val height = constraints.maxHeight
 
@@ -446,4 +460,69 @@ fun CircularProgressBar(
             fontWeight = FontWeight.Bold
         )
     }
+}
+
+@Composable
+private fun InfoDialog(isShowing: MutableState<Boolean>, dataStore: MyDataStore) {
+    var avg by remember { mutableStateOf("") }
+    val scope = rememberCoroutineScope()
+
+    ShowDialog(
+        title = "How many miles do you average a day?",
+        content = {
+            Column {
+                Text(
+                    "This will be used to calculate usage rates",
+                    fontSize = 16.sp,
+                    color = TextWhite
+                )
+                Spacer(modifier = Modifier.height(15.dp))
+                OutlinedTextField(
+                    value = avg,
+                    onValueChange = { avg = it },
+                    label = { Text(text = "Enter daily mileage average", color = TextWhite) },
+                    leadingIcon = {
+                        Icon(
+                            Icons.Default.Add,
+                            contentDescription = "Daily mileage average",
+                            tint = TextWhite
+                        )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 10.dp, top = 10.dp),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        textColor = TextWhite,
+                        focusedBorderColor = LightRed,
+                        unfocusedBorderColor = TextWhite,
+                        focusedLabelColor = LightRed,
+                        cursorColor = DeepBlue
+                    )
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                colors = ButtonDefaults.outlinedButtonColors(
+                    backgroundColor = LightRed
+                ),
+                onClick = {
+                isShowing.value = false
+                scope.launch {
+                    dataStore.saveDailyMileageAverage(avg.toFloat())
+                }
+            }) {
+                Text(text = "OK", color = Color.White)
+            }
+        },
+        dismissButton = {
+            Button(
+                colors = ButtonDefaults.outlinedButtonColors(
+                    backgroundColor = LightRed
+                ),
+                onClick = { isShowing.value = false }) {
+                Text(text = "BACK", color = Color.White)
+            }
+        }, isShowing = isShowing
+    )
 }
