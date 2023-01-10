@@ -61,13 +61,15 @@ fun HomePage() {
                 vehicleItems = listOf(
                     VehicleItem(
                         title = "Motor Oil Usage",
-                        circularProgressBar = { CircularProgressBar(percentage = .15f) },
+                        usagePercentage = .91f,
+                        circularProgressBar = { CircularProgressBar(percentage = .91f) },
                         lightColor = BlueViolet1,
                         mediumColor = BlueViolet2,
                         darkColor = BlueViolet3
                     ),
                     VehicleItem(
                         title = "Coolant Usage",
+                        usagePercentage = .77f,
                         circularProgressBar = { CircularProgressBar(percentage = .77f) },
                         lightColor = LightGreen1,
                         mediumColor = LightGreen2,
@@ -75,6 +77,7 @@ fun HomePage() {
                     ),
                     VehicleItem(
                         title = "Brake Fluid Usage",
+                        usagePercentage = .25f,
                         circularProgressBar = { CircularProgressBar(percentage = .25f) },
                         lightColor = OrangeYellow1,
                         mediumColor = OrangeYellow2,
@@ -82,6 +85,7 @@ fun HomePage() {
                     ),
                     VehicleItem(
                         title = "Power Steering Usage",
+                        usagePercentage = .2f,
                         circularProgressBar = { CircularProgressBar(percentage = .2f) },
                         lightColor = Beige1,
                         mediumColor = Beige2,
@@ -89,14 +93,16 @@ fun HomePage() {
                     ),
                     VehicleItem(
                         title = "Wipe Blades Usage",
-                        circularProgressBar = { CircularProgressBar(percentage = .3f) },
+                        usagePercentage = .8f,
+                        circularProgressBar = { CircularProgressBar(percentage = .8f) },
                         lightColor = LightGreen1,
                         mediumColor = LightGreen2,
                         darkColor = LightGreen3
                     ),
                     VehicleItem(
                         title = "Brake Pads Usage",
-                        circularProgressBar = { CircularProgressBar(percentage = 1f) },
+                        usagePercentage = .96f,
+                        circularProgressBar = { CircularProgressBar(percentage = .96f) },
                         lightColor = OrangeYellow1,
                         mediumColor = OrangeYellow2,
                         darkColor = OrangeYellow3
@@ -306,8 +312,20 @@ private fun VehicleItem(
                 .fillMaxSize()
                 .padding(5.dp)
         ) {
-            Spacer(modifier = Modifier.height(50.dp))
-            vehicleItem.circularProgressBar()
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                vehicleItem.circularProgressBar()
+                Spacer(modifier = Modifier.width(65.dp))
+                if (vehicleItem.usagePercentage > .90f) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_baseline_error_24),
+                        contentDescription = "Usage Warning",
+                        tint = DeepBlue
+                    )
+                }
+            }
         }
     }
 }

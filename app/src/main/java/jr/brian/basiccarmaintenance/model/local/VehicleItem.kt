@@ -7,6 +7,7 @@ import androidx.compose.ui.graphics.Color
 //@Entity(tableName = "vehicle_items")
 data class VehicleItem(
     val title: String,
+    val usagePercentage: Float = 0f,
     val circularProgressBar: @Composable () -> Unit,
     val lightColor: Color,
     val mediumColor: Color,
