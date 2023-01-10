@@ -1,9 +1,11 @@
 package jr.brian.basiccarmaintenance.model.local
 
-//import androidx.room.Entity
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-//@Entity(tableName = "vehicle_items")
+@Entity(tableName = "vehicle_items")
 data class VehicleItem(
+    @PrimaryKey val associatedVehicle: String,
     val title: String,
     val usagePercentage: String = "0f",
     val lightColorStr: String,

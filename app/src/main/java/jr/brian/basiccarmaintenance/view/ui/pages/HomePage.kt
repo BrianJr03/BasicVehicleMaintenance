@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import jr.brian.basiccarmaintenance.model.local.BottomMenuContent
 import jr.brian.basiccarmaintenance.model.local.VehicleItem
+import jr.brian.basiccarmaintenance.model.local.VehicleItemsDao
 import jr.brian.basiccarmaintenance.standardQuadFromTo
 import jr.brian.basiccarmaintenance.util.MyDataStore
 import jr.brian.basiccarmaintenance.view.ui.theme.*
@@ -38,7 +39,7 @@ import jr.brian.basiccarmaintence.R
 import kotlinx.coroutines.launch
 
 @Composable
-fun HomePage() {
+fun HomePage(dao: VehicleItemsDao) {
     val context = LocalContext.current
     val dataStore = MyDataStore(context)
     Box(
@@ -47,6 +48,12 @@ fun HomePage() {
             .fillMaxSize()
     ) {
         val vehicles = listOf("Jeep Cherokee '14", "Vestar Mini")
+        val currentVehicle =
+            dataStore.getCurrentVehicle.collectAsState("")
+        val associatedVehicle = vehicles[vehicles.indexOf(currentVehicle.value)]
+
+        val vehiclesItems = remember { dao.getVehicleItems().toMutableStateList() }
+
         Column {
             InfoSection()
             VehicleSection(
@@ -58,50 +65,52 @@ fun HomePage() {
 //                dataStore = dataStore
 //            )
             VehicleItemsSection(
-                vehicleItems = listOf(
-                    VehicleItem(
-                        title = "Motor Oil Usage",
-                        usagePercentage = ".91f",
-                        lightColorStr = BlueViolet1.value.toString(),
-                        mediumColorStr = BlueViolet2.value.toString(),
-                        darkColorStr = BlueViolet3.value.toString()
-                    ),
-                    VehicleItem(
-                        title = "Coolant Usage",
-                        usagePercentage = ".77f",
-                        lightColorStr = LightGreen1.value.toString(),
-                        mediumColorStr = LightGreen2.value.toString(),
-                        darkColorStr = LightGreen3.value.toString()
-                    ),
-                    VehicleItem(
-                        title = "Brake Fluid Usage",
-                        usagePercentage = ".25f",
-                        lightColorStr = OrangeYellow1.value.toString(),
-                        mediumColorStr = OrangeYellow2.value.toString(),
-                        darkColorStr = OrangeYellow3.value.toString()
-                    ),
-                    VehicleItem(
-                        title = "Power Steering Usage",
-                        usagePercentage = ".2f",
-                        lightColorStr = Beige1.value.toString(),
-                        mediumColorStr = Beige2.value.toString(),
-                        darkColorStr = Beige3.value.toString()
-                    ),
-                    VehicleItem(
-                        title = "Wipe Blades Usage",
-                        usagePercentage = ".8f",
-                        lightColorStr = LightGreen1.value.toString(),
-                        mediumColorStr = LightGreen2.value.toString(),
-                        darkColorStr = LightGreen3.value.toString()
-                    ),
-                    VehicleItem(
-                        title = "Brake Pads Usage",
-                        usagePercentage = ".96f",
-                        lightColorStr = OrangeYellow1.value.toString(),
-                        mediumColorStr = OrangeYellow2.value.toString(),
-                        darkColorStr = OrangeYellow3.value.toString()
+                vehicleItems = vehiclesItems.ifEmpty {
+                    listOf(
+                        VehicleItem(
+                            associatedVehicle = associatedVehicle,
+                            title = "Motor Oil Usage",
+                            lightColorStr = BlueViolet1.value.toString(),
+                            mediumColorStr = BlueViolet2.value.toString(),
+                            darkColorStr = BlueViolet3.value.toString()
+                        ),
+                        VehicleItem(
+                            associatedVehicle = associatedVehicle,
+                            title = "Coolant Usage",
+                            lightColorStr = LightGreen1.value.toString(),
+                            mediumColorStr = LightGreen2.value.toString(),
+                            darkColorStr = LightGreen3.value.toString()
+                        ),
+                        VehicleItem(
+                            associatedVehicle = associatedVehicle,
+                            title = "Brake Fluid Usage",
+                            lightColorStr = OrangeYellow1.value.toString(),
+                            mediumColorStr = OrangeYellow2.value.toString(),
+                            darkColorStr = OrangeYellow3.value.toString()
+                        ),
+                        VehicleItem(
+                            associatedVehicle = associatedVehicle,
+                            title = "Power Steering Usage",
+                            lightColorStr = Beige1.value.toString(),
+                            mediumColorStr = Beige2.value.toString(),
+                            darkColorStr = Beige3.value.toString()
+                        ),
+                        VehicleItem(
+                            associatedVehicle = associatedVehicle,
+                            title = "Wipe Blades Usage",
+                            lightColorStr = LightGreen1.value.toString(),
+                            mediumColorStr = LightGreen2.value.toString(),
+                            darkColorStr = LightGreen3.value.toString()
+                        ),
+                        VehicleItem(
+                            associatedVehicle = associatedVehicle,
+                            title = "Brake Pads Usage",
+                            lightColorStr = OrangeYellow1.value.toString(),
+                            mediumColorStr = OrangeYellow2.value.toString(),
+                            darkColorStr = OrangeYellow3.value.toString()
+                        )
                     )
-                )
+                }
             )
         }
 //        BottomMenu(
