@@ -1,15 +1,14 @@
-package jr.brian.basiccarmaintenance.ui.pages
+package jr.brian.basiccarmaintenance.view.ui.pages
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -23,20 +22,25 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import jr.brian.basiccarmaintenance.BottomMenuContent
-import jr.brian.basiccarmaintenance.VehicleItem
+import jr.brian.basiccarmaintenance.model.local.BottomMenuContent
+import jr.brian.basiccarmaintenance.model.local.VehicleItem
 import jr.brian.basiccarmaintenance.standardQuadFromTo
-import jr.brian.basiccarmaintenance.ui.theme.*
+import jr.brian.basiccarmaintenance.util.MyDataStore
+import jr.brian.basiccarmaintenance.view.ui.theme.*
 import jr.brian.basiccarmaintence.R
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomePage() {
+    val context = LocalContext.current
+    val dataStore = MyDataStore(context)
     Box(
         modifier = Modifier
             .background(DeepBlue)
@@ -45,8 +49,14 @@ fun HomePage() {
         val vehicles = listOf("Jeep Cherokee '14", "Vestar Mini")
         Column {
             InfoSection()
-            VehicleSection(vehicles = vehicles)
-            CurrentVehicle(currentVehicle = vehicles[0])
+            VehicleSection(
+                vehicles = vehicles,
+                dataStore = dataStore
+            )
+            CurrentVehicle(
+                defaultVehicle = vehicles[0],
+                dataStore = dataStore
+            )
             VehicleItemsSection(
                 vehicleItems = listOf(
                     VehicleItem(
@@ -131,8 +141,12 @@ private fun InfoSection() {
 
 @Composable
 private fun VehicleSection(
-    vehicles: List<String>
+    vehicles: List<String>,
+    dataStore: MyDataStore
 ) {
+    val currentVehicle =
+        dataStore.getCurrentVehicle.collectAsState("")
+    val scope = rememberCoroutineScope()
     var selectedVehicleIndex by remember {
         mutableStateOf(0)
     }
@@ -144,10 +158,13 @@ private fun VehicleSection(
                     .padding(start = 15.dp, top = 15.dp, bottom = 15.dp)
                     .clickable {
                         selectedVehicleIndex = it
+                        scope.launch {
+                            dataStore.saveCurrentVehicleIndex(vehicles[it])
+                        }
                     }
                     .clip(RoundedCornerShape(10.dp))
                     .background(
-                        if (selectedVehicleIndex == it) ButtonBlue
+                        if (vehicles.indexOf(currentVehicle.value) == it) ButtonBlue
                         else DarkerButtonBlue
                     )
                     .padding(15.dp)
@@ -160,9 +177,12 @@ private fun VehicleSection(
 
 @Composable
 private fun CurrentVehicle(
-    currentVehicle: String,
+    defaultVehicle: String,
+    dataStore: MyDataStore,
     color: Color = LightRed
 ) {
+    val currentVehicle =
+        dataStore.getCurrentVehicle.collectAsState("")
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -174,7 +194,7 @@ private fun CurrentVehicle(
             .fillMaxWidth()
     ) {
         Text(
-            text = currentVehicle,
+            text = currentVehicle.value ?: defaultVehicle,
             color = TextWhite,
             style = MaterialTheme.typography.h2
         )
@@ -192,7 +212,6 @@ private fun CurrentVehicle(
 }
 
 @Composable
-@OptIn(ExperimentalFoundationApi::class)
 private fun VehicleItemsSection(vehicleItems: List<VehicleItem>) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
@@ -201,7 +220,7 @@ private fun VehicleItemsSection(vehicleItems: List<VehicleItem>) {
             modifier = Modifier.padding(15.dp)
         )
         LazyVerticalGrid(
-            cells = GridCells.Fixed(2),
+            columns = GridCells.Fixed(2),
             contentPadding = PaddingValues(start = 7.5.dp, end = 7.5.dp, bottom = 100.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -279,8 +298,6 @@ private fun VehicleItem(
                 lineHeight = 26.sp,
             )
         }
-        
-
 
         Column(
             verticalArrangement = Arrangement.Center,

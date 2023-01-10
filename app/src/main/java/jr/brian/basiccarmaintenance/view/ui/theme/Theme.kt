@@ -1,4 +1,4 @@
-package jr.brian.basiccarmaintenance.ui.theme
+package jr.brian.basiccarmaintenance.view.ui.theme
 
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
