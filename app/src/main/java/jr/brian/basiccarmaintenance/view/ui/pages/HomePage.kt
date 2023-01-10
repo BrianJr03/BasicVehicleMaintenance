@@ -68,7 +68,7 @@ fun HomePage() {
                     ),
                     VehicleItem(
                         title = "Coolant Usage",
-                        circularProgressBar = { CircularProgressBar(percentage = .44f) },
+                        circularProgressBar = { CircularProgressBar(percentage = .77f) },
                         lightColor = LightGreen1,
                         mediumColor = LightGreen2,
                         darkColor = LightGreen3
@@ -96,7 +96,7 @@ fun HomePage() {
                     ),
                     VehicleItem(
                         title = "Brake Pads Usage",
-                        circularProgressBar = { CircularProgressBar(percentage = 0.53f) },
+                        circularProgressBar = { CircularProgressBar(percentage = 1f) },
                         lightColor = OrangeYellow1,
                         mediumColor = OrangeYellow2,
                         darkColor = OrangeYellow3
@@ -246,11 +246,11 @@ private fun VehicleItem(
         val height = constraints.maxHeight
 
         // Medium Color Path
-        val medColorPath1 = Offset(0f, height * 0.3f)
-        val medColorPath2 = Offset(0.1f, height * 0.35f)
-        val medColorPath3 = Offset(0.4f, height * 0.05f)
-        val medColorPath4 = Offset(0.75f, height * 0.7f)
-        val medColorPath5 = Offset(1.4f, -height.toFloat())
+        val medColorPath1 = Offset(0f, -(height * 0.3f))
+        val medColorPath2 = Offset(0.1f, height * -0.35f)
+        val medColorPath3 = Offset(-1f, height * 0.05f)
+        val medColorPath4 = Offset(0f, height * 0.7f)
+        val medColorPath5 = Offset(0.4f, height.toFloat())
 
         val medColorPath = Path().apply {
             moveTo(medColorPath1.x, medColorPath1.y)
@@ -264,11 +264,11 @@ private fun VehicleItem(
         }
 
         // Light colored path
-        val lightPoint1 = Offset(0f, height * 0.35f)
-        val lightPoint2 = Offset(width * 0.1f, height * 0.4f)
-        val lightPoint3 = Offset(width * 0.3f, height * 0.35f)
+        val lightPoint1 = Offset(0f, -(height * 0.35f))
+        val lightPoint2 = Offset(width * -0.1f, height * 0.4f)
+        val lightPoint3 = Offset(width * 1f, height * 0.97f)
         val lightPoint4 = Offset(width * 0.65f, height.toFloat())
-        val lightPoint5 = Offset(width * 1.4f, -height.toFloat() / 3f)
+        val lightPoint5 = Offset(width * 0.4f, height.toFloat() / 3f)
 
         val lightColoredPath = Path().apply {
             moveTo(lightPoint1.x, lightPoint1.y)
@@ -300,11 +300,11 @@ private fun VehicleItem(
         }
 
         Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Bottom,
+            horizontalAlignment = Alignment.Start,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(15.dp)
+                .padding(5.dp)
         ) {
             Spacer(modifier = Modifier.height(50.dp))
             vehicleItem.circularProgressBar()
@@ -386,10 +386,10 @@ private fun BottomMenuItem(
 @Composable
 fun CircularProgressBar(
     percentage: Float,
-    fontSize: TextUnit = 28.sp,
-    radius: Dp = 35.dp,
+    fontSize: TextUnit = 18.sp,
+    radius: Dp = 27.dp,
     color: Color = DeepBlue,
-    strokeWidth: Dp = 4.dp,
+    strokeWidth: Dp = 3.dp,
     animationDuration: Int = 1000, // Milliseconds
     animationDelay: Int = 0
 ) {
