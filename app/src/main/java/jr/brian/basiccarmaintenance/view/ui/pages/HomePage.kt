@@ -53,75 +53,69 @@ fun HomePage() {
                 vehicles = vehicles,
                 dataStore = dataStore
             )
-            CurrentVehicle(
-                defaultVehicle = vehicles[0],
-                dataStore = dataStore
-            )
+//            CurrentVehicle(
+//                defaultVehicle = vehicles[0],
+//                dataStore = dataStore
+//            )
             VehicleItemsSection(
                 vehicleItems = listOf(
                     VehicleItem(
                         title = "Motor Oil Usage",
-                        usagePercentage = .91f,
-                        circularProgressBar = { CircularProgressBar(percentage = .91f) },
-                        lightColor = BlueViolet1,
-                        mediumColor = BlueViolet2,
-                        darkColor = BlueViolet3
+                        usagePercentage = ".91f",
+                        lightColorStr = BlueViolet1.value.toString(),
+                        mediumColorStr = BlueViolet2.value.toString(),
+                        darkColorStr = BlueViolet3.value.toString()
                     ),
                     VehicleItem(
                         title = "Coolant Usage",
-                        usagePercentage = .77f,
-                        circularProgressBar = { CircularProgressBar(percentage = .77f) },
-                        lightColor = LightGreen1,
-                        mediumColor = LightGreen2,
-                        darkColor = LightGreen3
+                        usagePercentage = ".77f",
+                        lightColorStr = LightGreen1.value.toString(),
+                        mediumColorStr = LightGreen2.value.toString(),
+                        darkColorStr = LightGreen3.value.toString()
                     ),
                     VehicleItem(
                         title = "Brake Fluid Usage",
-                        usagePercentage = .25f,
-                        circularProgressBar = { CircularProgressBar(percentage = .25f) },
-                        lightColor = OrangeYellow1,
-                        mediumColor = OrangeYellow2,
-                        darkColor = OrangeYellow3
+                        usagePercentage = ".25f",
+                        lightColorStr = OrangeYellow1.value.toString(),
+                        mediumColorStr = OrangeYellow2.value.toString(),
+                        darkColorStr = OrangeYellow3.value.toString()
                     ),
                     VehicleItem(
                         title = "Power Steering Usage",
-                        usagePercentage = .2f,
-                        circularProgressBar = { CircularProgressBar(percentage = .2f) },
-                        lightColor = Beige1,
-                        mediumColor = Beige2,
-                        darkColor = Beige3
+                        usagePercentage = ".2f",
+                        lightColorStr = Beige1.value.toString(),
+                        mediumColorStr = Beige2.value.toString(),
+                        darkColorStr = Beige3.value.toString()
                     ),
                     VehicleItem(
                         title = "Wipe Blades Usage",
-                        usagePercentage = .8f,
-                        circularProgressBar = { CircularProgressBar(percentage = .8f) },
-                        lightColor = LightGreen1,
-                        mediumColor = LightGreen2,
-                        darkColor = LightGreen3
+                        usagePercentage = ".8f",
+                        lightColorStr = LightGreen1.value.toString(),
+                        mediumColorStr = LightGreen2.value.toString(),
+                        darkColorStr = LightGreen3.value.toString()
                     ),
                     VehicleItem(
                         title = "Brake Pads Usage",
-                        usagePercentage = .96f,
-                        circularProgressBar = { CircularProgressBar(percentage = .96f) },
-                        lightColor = OrangeYellow1,
-                        mediumColor = OrangeYellow2,
-                        darkColor = OrangeYellow3
+                        usagePercentage = ".96f",
+                        lightColorStr = OrangeYellow1.value.toString(),
+                        mediumColorStr = OrangeYellow2.value.toString(),
+                        darkColorStr = OrangeYellow3.value.toString()
                     )
                 )
             )
         }
-        BottomMenu(
-            items = listOf(
-                BottomMenuContent(
-                    title = "Home",
-                    R.drawable.ic_home_2
-                ),
-                BottomMenuContent(
-                    title = "Settings",
-                    R.drawable.ic_settings
-                )
-            ), modifier = Modifier.align(Alignment.BottomCenter)
-        )
+//        BottomMenu(
+//            items = listOf(
+//                BottomMenuContent(
+//                    title = "Home",
+//                    R.drawable.ic_home_2
+//                ),
+//                BottomMenuContent(
+//                    title = "Settings",
+//                    R.drawable.ic_settings
+//                )
+//            ), modifier = Modifier.align(Alignment.BottomCenter)
+//        )
     }
 }
 
@@ -246,7 +240,7 @@ private fun VehicleItem(
             .padding(8.5.dp)
             .aspectRatio(1f)
             .clip(RoundedCornerShape(10.dp))
-            .background(vehicleItem.darkColor)
+            .background(Color(vehicleItem.darkColorStr.toULong()))
     ) {
         val width = constraints.maxWidth
         val height = constraints.maxHeight
@@ -288,8 +282,8 @@ private fun VehicleItem(
         }
 
         Canvas(modifier = Modifier.fillMaxSize()) {
-            drawPath(path = medColorPath, color = vehicleItem.mediumColor)
-            drawPath(path = lightColoredPath, color = vehicleItem.lightColor)
+            drawPath(path = medColorPath, color = Color(vehicleItem.mediumColorStr.toULong()))
+            drawPath(path = lightColoredPath, color = Color(vehicleItem.lightColorStr.toULong()))
         }
 
         Box(
@@ -316,9 +310,9 @@ private fun VehicleItem(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                vehicleItem.circularProgressBar()
+                CircularProgressBar(percentage = vehicleItem.usagePercentage.toFloat())
                 Spacer(modifier = Modifier.width(65.dp))
-                if (vehicleItem.usagePercentage > .90f) {
+                if (vehicleItem.usagePercentage.toFloat() > .90f) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_baseline_error_24),
                         contentDescription = "Usage Warning",
