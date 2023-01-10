@@ -1,4 +1,4 @@
-package jr.brian.basiccarmaintenance
+package jr.brian.basiccarmaintenance.util
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Path

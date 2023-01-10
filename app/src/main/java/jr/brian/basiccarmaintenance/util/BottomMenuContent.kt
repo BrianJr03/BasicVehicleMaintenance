@@ -1,4 +1,4 @@
-package jr.brian.basiccarmaintenance.model.local
+package jr.brian.basiccarmaintenance.util
 
 import androidx.annotation.DrawableRes
 

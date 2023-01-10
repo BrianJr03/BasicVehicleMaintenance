@@ -1,4 +1,4 @@
-package jr.brian.basiccarmaintenance.util
+package jr.brian.basiccarmaintenance.model
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -19,7 +19,7 @@ class MyDataStore(private val context: Context) {
         preferences[CURRENT_SELECTED_VEHICLE]
     }
 
-    suspend fun saveCurrentVehicleIndex(currentVehicle: String) {
+    suspend fun saveCurrentVehicle(currentVehicle: String) {
         context.dataStore.edit { preferences ->
             preferences[CURRENT_SELECTED_VEHICLE] = currentVehicle
         }
